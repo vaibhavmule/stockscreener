@@ -25,15 +25,33 @@ def get_db():
 	finally:
 		db.close()
 
+
 @app.get("/")
-def home(request: Request, db: Session = Depends(get_db)):
+def home(request: Request, forward_pe=None, divident_yeild=None, ma50=None, ma200=None, db: Session = Depends(get_db)):
 	"""
 	Displays the stocks screen dashboard / homepage
 	"""
-	stocks = db.query(Stock).all()
+	stocks = db.query(Stock)
+	
+	if forward_pe:
+		stocks = stocks.filter(Stock.forward_pe < forward_pe)
+
+	if divident_yeild:
+		stocks = stocks.filter(Stock.divident_yeild > divident_yeild)
+
+	if ma50:
+		stocks = stocks.filter(Stock.price > Stock.ma50)
+
+	if ma200:
+		stocks = stocks.filter(Stock.price > Stock.ma200)
+
 	return templates.TemplateResponse("home.html", {
 		"request": request,
-		'stocks': stocks
+		'stocks': stocks,
+		'forward_pe': forward_pe,
+		'divident_yeild': divident_yeild,
+		'ma50': ma50,
+		'ma200': ma200
 	})
 
 
