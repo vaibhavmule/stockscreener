@@ -26,12 +26,14 @@ def get_db():
 		db.close()
 
 @app.get("/")
-def home(request: Request):
+def home(request: Request, db: Session = Depends(get_db)):
 	"""
 	Displays the stocks screen dashboard / homepage
 	"""
+	stocks = db.query(Stock).all()
 	return templates.TemplateResponse("home.html", {
-		"request": request
+		"request": request,
+		'stocks': stocks
 	})
 
 
